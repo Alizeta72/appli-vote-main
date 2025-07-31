@@ -1,0 +1,141 @@
+Voici les étapes claires et dans l'ordre que ton ami doit suivre pour faire tourner ton projet et accéder aux URLs localement :
+
+✅ 1. Prérequis installés sur sa machine
+Ton ami doit avoir installé :
+
+Docker Desktop
+
+kubectl (outil Kubernetes)
+
+(Facultatif si vous utilisez minikube ou Docker Desktop : minikube)
+
+✅ 2. Cloner le projet
+bash
+Copier
+Modifier
+git clone <lien_git_si_dispo> appli-vote-main
+cd appli-vote-main
+Ou copier tout le dossier appli-vote-main/ sur sa machine.
+
+✅ 3. Lancer la version Docker Compose (locale)
+💡 Si tu veux tester localement avec Docker uniquement (sans Kubernetes) :
+
+bash
+Copier
+Modifier
+docker-compose up --build
+Il pourra accéder à :
+🧾 Formulaire PHP : http://localhost:8080
+
+📊 Résultats Node.js : http://localhost:3005
+
+✅ 4. Lancer la version Kubernetes (avancée)
+S’il veut utiliser Kubernetes pour tester avec plusieurs instances :
+
+a. Créer tous les objets Kubernetes (services + déploiements)
+bash
+Copier
+Modifier
+kubectl apply -f k8s/db-deployment.yaml
+kubectl apply -f k8s/php-deployment.yaml
+kubectl apply -f k8s/php-service.yaml
+kubectl apply -f k8s/node-deployment.yaml
+kubectl apply -f k8s/node-service.yaml
+b. Lister les services exposés :
+bash
+Copier
+Modifier
+kubectl get services
+Il verra quelque chose comme :
+
+bash
+Copier
+Modifier
+NAME              TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+php-service       NodePort   10.1.0.34       <none>        80:30929/TCP     3m
+node-service      NodePort   10.1.0.125      <none>        3005:30168/TCP   3m
+c. Accéder aux URLs Kubernetes :
+http://localhost:30929/index.php
+
+http://localhost:30929/vote.php
+
+http://localhost:30168
+
+Ces ports peuvent varier ! → Il doit bien vérifier les ports affichés par kubectl get services et les adapter dans le navigateur.
+
+✅ 5. Résumé des URLs (exemples)
+Technologie	URL (selon config)
+PHP avec Docker Compose	http://localhost:8080
+PHP avec Kubernetes	http://localhost:30929
+Node.js résultats (Compose)	http://localhost:3005
+Node.js résultats (Kubernetes)	http://localhost:30168
+
+----------------------------------------------------------
+
+
+Si tout cela est OK, tu peux partager ton projet tel quel à ton ami, il devra juste avoir Docker + Kubernetes (minikube, kind, ou cluster) et lancer :
+
+
+docker-compose up --build
+ou
+
+
+kubectl apply -f k8s/
+
+
+----------------------------------------------------------
+
+
+comment faire pour relancer ton appli Kubernetes après un redémarrage du PC :
+
+1. Redémarre ton cluster Kubernetes
+Si tu utilises Docker Desktop (avec Kubernetes intégré) :
+Démarre Docker Desktop, ça lance automatiquement Kubernetes.
+
+Si tu as un cluster local (ex : minikube), lance :
+
+bash
+Copier
+Modifier
+minikube start
+Si tu as un cluster distant (ex : sur un cloud), il est probablement déjà actif.
+
+2. Va dans ton dossier projet où tu as tes manifests Kubernetes (.yaml)
+3. Relance tes déploiements et services (si tu n'as pas configuré de persistency particulière)
+
+kubectl apply -f deployment.yaml
+kubectl apply -f service.yaml
+ou si tout est dans un seul fichier :
+
+
+kubectl apply -f k8s.yaml
+Si tu as déjà appliqué une fois ces fichiers et que rien n’a été supprimé, normalement tes pods tournent encore. Tu peux vérifier :
+
+
+kubectl get pods
+kubectl get services
+4. Si tu utilises Docker Compose pour la version locale, dans le dossier avec docker-compose.yml :
+
+docker-compose up --build
+Ça va rebuild et relancer tous les containers.
+
+
+
+| Cas                     | Commandes principales                                                              |
+| ----------------------- | ---------------------------------------------------------------------------------- |
+| Kubernetes local Docker | Démarrer Docker Desktop (auto start Kubernetes) puis : `kubectl apply -f k8s.yaml` |
+| Kubernetes minikube     | `minikube start` + `kubectl apply -f k8s.yaml`                                     |
+| Docker Compose local    | `docker-compose up --build`                                                        |
+
+
+
+
+---------------------------------
+
+pour relancer le projet sans reconstruire, fais simplement :
+
+
+docker-compose up -d
+
+
+------------------------

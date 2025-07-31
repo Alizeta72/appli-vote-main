@@ -1,0 +1,13 @@
+{
+  "name": "node",
+  "version": "1.0.0",
+  "description": "Application pour afficher les résultats des votes",
+  "main": "results.js",
+  "scripts": {
+    "start": "node results.js"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "pg": "^8.7.1"
+  }
+}

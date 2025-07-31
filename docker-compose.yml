@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: vote-app
+  template:
+    metadata:
+      labels:
+        app: vote-app
+    spec:
+      containers:
+      - name: vote-app
+        image: php:8.2-apache
+        ports:
+        - containerPort: 80
+        env:
+        - name: POSTGRES_HOST
+          value: postgres-service
+        - name: POSTGRES_DB
+          value: vote_db
+        - name: POSTGRES_USER
+          value: user
+        - name: POSTGRES_PASSWORD
+          value: password
+        volumeMounts:
+        - name: php-code
+          mountPath: /var/www/html
+      volumes:
+      - name: php-code
+        hostPath:
+          path: /mnt/c/appli-vote-main/php
+          type: Directory
