@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # appli-vote
 Appli de vote pour tester l'orchestration de conteneurs avec docker-compose et kubernates!
 
@@ -53,6 +53,3 @@ Le projet devra à terme avoir la struture suivante:
 <img width="500" height="544" alt="Structure du projet" src="https://github.com/user-attachments/assets/a7cd2e60-2b89-4d0f-9829-38a607bc031d" />
 
 
-=======
-# appli-vote-main
->>>>>>> d33c864366e63ca83592e20292666d302131015f
