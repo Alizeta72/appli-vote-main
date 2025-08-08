@@ -1,0 +1,68 @@
+Les membres du groupe
+
+    BAGO Bérénice Yipènè Hatamu
+    OUEDRAOGO Alizeta
+    ZANGA Issa
+
+
+README – Démarrage du projet Kubernetes "appli-vote"
+Prérequis
+Avoir Docker Desktop installé (et Kubernetes activé).
+
+kubectl est déjà installé (via Docker Desktop).
+
+Les dossiers sont organisés comme ceci :
+
+C:\appli-vote-main\
+├── docker-compose.yml
+├── php\
+    ├── index.php
+    ├── vote.php
+├── node\
+    ├── Dockerfile
+    ├── package.json
+    ├── results.js
+├── db\
+    ├── init.sql
+└── k8s\
+    ├── node-deployment.yaml
+    ├── php-deployment.yaml
+    ├── postgres-deployment.yaml
+    ├── services.yaml
+
+
+
+Pour tester localement avec Docker uniquement (sans Kubernetes) :
+
+    docker-compose up --build
+
+Pour accéder à :
+    Formulaire PHP : http://localhost:8080
+
+    Résultats Node.js : http://localhost:3005
+
+
+Construire l’image Docker de ton service Node.js (results)
+
+    docker build -t appli-vote-main-node ./node
+
+
+Appliquer la configuration Kubernetes (dans le dossier k8s/)
+
+    kubectl apply -f k8s/
+
+Vérifier que les pods tournent bien
+
+    kubectl get pods
+
+
+Résumé des commandes 
+
+    docker build -t appli-vote-main-node ./node
+    kubectl apply -f k8s/
+    kubectl get pods
+
+Accéder aux applications via les ports exposés (NodePort)
+    Pour le vote (PHP) : http://localhost:30080/
+
+    Pour les résultats (Node) : http://localhost:30005/

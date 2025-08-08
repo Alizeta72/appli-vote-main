@@ -1,0 +1,56 @@
+
+services:
+  db:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_DB: votedb
+      POSTGRES_USER: voteuser
+      POSTGRES_PASSWORD: votepass
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - vote-net
+
+  php:
+    image: php:8.2-apache
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_DB: votedb
+      POSTGRES_USER: voteuser
+      POSTGRES_PASSWORD: votepass
+    volumes:
+      - ./php:/var/www/html:cached
+    depends_on:
+      - db
+    # la commande pour installer pdo_pgsql au démarrage (pratique pour dev)
+    command: bash -lc "apt-get update && apt-get install -y libpq-dev && docker-php-ext-install pdo_pgsql && apache2-foreground"
+    networks:
+      - vote-net
+
+  results:
+    build:
+      context: ./node
+    restart: always
+    ports:
+      - "3005:3005"
+    environment:
+      POSTGRES_HOST: db
+      POSTGRES_DB: votedb
+      POSTGRES_USER: voteuser
+      POSTGRES_PASSWORD: votepass
+    depends_on:
+      - db
+    networks:
+      - vote-net
+
+volumes:
+  db-data:
+
+networks:
+  vote-net:
+    driver: bridge

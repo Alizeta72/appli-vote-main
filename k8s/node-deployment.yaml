@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-results
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node-results
+  template:
+    metadata:
+      labels:
+        app: node-results
+    spec:
+      initContainers:
+        - name: wait-for-postgres
+          image: busybox
+          command:
+            - sh
+            - -c
+            - |
+              until nc -z postgres 5432; do
+                echo "Waiting for postgres..."
+                sleep 2
+              done
+      containers:
+        - name: node-results
+          image: appli-vote-main-node
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3005
+          env:
+            - name: POSTGRES_HOST
+              value: "postgres"
+            - name: POSTGRES_DB
+              value: "votedb"
+            - name: POSTGRES_USER
+              value: "voteuser"
+            - name: POSTGRES_PASSWORD
+              value: "votepass"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: node-results
+spec:
+  type: NodePort
+  selector:
+    app: node-results
+  ports:
+    - port: 3005
+      targetPort: 3005
+      nodePort: 30005
